@@ -1,0 +1,49 @@
+{
+  "kot": [
+    "cat",
+    "puss",
+    "feline"
+  ],
+  "pies": [
+    "dog",
+    "pooch",
+    "cur"
+  ],
+  "samochod": [
+    "car",
+    "automobile",
+    "auto"
+  ],
+  "zwierze": [
+    "animal",
+    "beast"
+  ],
+  "mapa": [
+    "map",
+    "chart"
+  ],
+  "samolot": [
+    "plane",
+    "kite",
+    "aircraft"
+  ],
+  "spacer": [
+    "walk",
+    "stroll",
+    "wander"
+  ],
+  "lubic": [
+    "like",
+    "love",
+    "enjoy"
+  ],
+  "kula": [
+    "ball",
+    "sphere",
+    "bullet"
+  ],
+  "piorun": [
+    "thunderbolt",
+    "lightning"
+  ]
+}
