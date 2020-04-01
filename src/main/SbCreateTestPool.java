@@ -5,17 +5,19 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
+import java.util.Random;
 import com.google.gson.*;
 
 public class SbCreateTestPool {
 
-	public static void createPool() throws IOException
-	{
-		Map<String, String[]> map = new HashMap<>();
-		
+	protected Map<String, String[]> map = new HashMap<>();
+	
+	public void createPool() throws IOException
+	{				
 		map.put("kot", new String[] {"cat","puss","feline"});
 		map.put("pies", new String[] {"dog","pooch","cur"});
 		map.put("lubic", new String[] {"like","love","enjoy"});
@@ -36,14 +38,15 @@ public class SbCreateTestPool {
 
 	    writer.close();
 	}
-	public static Map<String,String[]> getWordsFromJson()
+	
+	public Map<String,String[]> getWordsFromJson()
 	{
 		try {
 		    Gson gson = new Gson();
 
 		    Reader reader = Files.newBufferedReader(Paths.get("PolEngTest.json"));
 
-		    Map<String, String[]> map = gson.fromJson(reader, Map.class);
+		    map = gson.fromJson(reader, Map.class);
 
 //		    // print map entries
 //		    for (Map.Entry<?, ?> entry : map.entrySet()) {
@@ -59,5 +62,26 @@ public class SbCreateTestPool {
 		    return null;
 		}
 
+	}
+	
+	public List<String> getRandomQuestionList()
+	{
+		if(!map.isEmpty())
+		{
+			Random rand = new Random();
+			List<String> lWordList = new ArrayList<String>(map.keySet());
+			List<String> lOutputList = new ArrayList<String>();
+
+				for(int i = 0; i < 5; i ++)
+				{					
+					int randomIndex = rand.nextInt(lWordList.size());
+					lOutputList.add(lWordList.get(randomIndex));
+					lWordList.remove(randomIndex);					
+				}
+				return lOutputList;
+		}else
+		{
+			return null;
+		}		
 	}
 }
