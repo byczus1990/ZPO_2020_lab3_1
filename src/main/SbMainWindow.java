@@ -4,6 +4,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Label;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -15,10 +18,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import main.SbGetLevenshteinDistance;
-import main.SbCreateTestPool;
+import main.SbJsonOperations;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 //import com.google.gson.*;
 public class SbMainWindow {
 
@@ -28,10 +30,11 @@ public class SbMainWindow {
 	private Text textWord_3;
 	private Text textWord_4;
 	private Text textWord_5;
-	protected static  Map<String,String[]> wordsMap;
+//	protected static  Map<String,String[]> wordsMap;
 	protected static List<String> choosenWords;
+	protected static long start = 0;
 	
-
+	static SbJsonOperations jsonOperations = new SbJsonOperations();		
 	public Random generator = new Random();
 	private Text textName;
 	private Text textSurname;
@@ -41,13 +44,14 @@ public class SbMainWindow {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SbCreateTestPool testPool = new SbCreateTestPool();				
+		
 		try {
-			testPool.createPool();
-			setWordsMap(testPool.getWordsFromJson());
-			setChoosenWords(testPool.getRandomQuestionList());
+			jsonOperations.createPool();
+//			setWordsMap(jsonOperations.getWordsFromJson());
+			jsonOperations.loadMapFromJson();			
+			setChoosenWords(jsonOperations.getRandomQuestionList());
 			SbMainWindow window = new SbMainWindow();
-//			System.out.print(wordsMap);
+			start = System.currentTimeMillis();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -189,12 +193,29 @@ public class SbMainWindow {
 		textSurname.setLayoutData(gd_textSurname);
 		
 		Button btnfinish = new Button(shell, SWT.NONE);
-		btnfinish.addKeyListener(new KeyAdapter() {
+		btnfinish.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
-			lblWord_1.setText(Integer.toString(SbGetLevenshteinDistance.getLevDist("first", "second")) );
+			public void widgetSelected(SelectionEvent e) {
+				setAnswers();
+				calculateScore();
+				try {
+					saveResult(getElapsedTime());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+//				lblWord_1.setText(Integer.toString(SbGetLevenshteinDistance.getLevDist("first", "second")) );
+				
+//				String elapsedTimeSec = String.valueOf(getElapsedTime());
+//				lblWord_2.setText(elapsedTimeSec);
 			}
 		});
+//		btnfinish.addKeyListener(new KeyAdapter() {
+//			@Override
+//			public void keyPressed(KeyEvent e) {
+//			lblWord_1.setText(Integer.toString(SbGetLevenshteinDistance.getLevDist("first", "second")) );
+//			}
+//		});
 		GridData gd_btnfinish = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_btnfinish.widthHint = 767;
 		btnfinish.setLayoutData(gd_btnfinish);
@@ -203,11 +224,39 @@ public class SbMainWindow {
 
 	}
 
-	public static void setWordsMap(Map<String,String[]> wordsMap) {
-		SbMainWindow.wordsMap = wordsMap;		
-	}
+//	public static void setWordsMap(Map<String,String[]> wordsMap) 
+//	{
+//		SbMainWindow.wordsMap = wordsMap;		
+//	}
 	
 	public static void setChoosenWords(List<String> choosenWords) {
 		SbMainWindow.choosenWords = choosenWords;
+	}
+	
+	public static double getElapsedTime(){
+		long elapsedTimeMillis = System.currentTimeMillis()-start;
+		float eTimeSec = (elapsedTimeMillis/1000F);
+		BigDecimal bd = new BigDecimal(eTimeSec).setScale(2, RoundingMode.HALF_UP);
+		double outputTime = bd.doubleValue();
+		
+		return outputTime;
+	}
+	public void calculateScore()
+	{
+		jsonOperations.calculateScore();
+	}
+	private void setAnswers()
+	{
+		jsonOperations.setAnswer1(textWord_1.getText());
+		jsonOperations.setAnswer2(textWord_2.getText());
+		jsonOperations.setAnswer3(textWord_3.getText());
+		jsonOperations.setAnswer4(textWord_4.getText());
+		jsonOperations.setAnswer5(textWord_5.getText());
+		jsonOperations.setName(textName.getText());
+		jsonOperations.setSurrname(textSurname.getText());
+	}
+	private void saveResult(double elapsedTime) throws IOException
+	{
+		jsonOperations.saveResultToJson(elapsedTime);
 	}
 }
